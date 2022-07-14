@@ -9,7 +9,7 @@ import pandas as pd
 
 app = Flask(__name__)
 
-
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://qzbpsqjecniedh:4b0927abd3e63c469757405cad31227a45c2dac99b2bf28bcf3bc73d6952f551@ec2-54-87-179-4.compute-1.amazonaws.com:5432/de2nnibui34bsl'
 # golbal variables
 api_key = 'RGAPI-69ed207d-fefd-40e5-b290-8ab3515238b9'
 watcher = LolWatcher(api_key)
