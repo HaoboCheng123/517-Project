@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<title>File Uploader</title>
+</head>
+<body>
+    {% for hist in hists %}
+        {% if ".MOV" in hist or ".mp4" in hist%}
+            <video width="320" height="240" controls>
+              <source src="{{url_for('static', filename='uploads/'+ hist)}}" type="video/mp4">
+              <source src="video3.ogg" type="video/ogg">
+            </video>
+        {% else %}
+            <img src="{{url_for('static', filename='uploads/'+ hist)}}" alt="{{hist}}">
+        {% endif %}
+    {% endfor %}
+    <form enctype = "multipart/form-data" onsubmit="return false;" >
+        <input id="file" type="file" name="static_file " />
+        <button id="upload-button" onclick="uploadFile(this.form)"> Upload </button>
+    </form>
+    <div id="static_file_response"> </div>
+
+</body>
+<script>
+    function uploadFile(form)
+    {
+     const formData = new FormData(form);
+     var oOutput = document.getElementById("static_file_response")
+     var oReq = new XMLHttpRequest();
+         oReq.open("POST", "upload_static_file", true);
+     oReq.onload = function(oEvent) {
+         if (oReq.status == 200) {
+           oOutput.innerHTML = "Uploaded!";
+           console.log(oReq.response)
+         } else {
+           oOutput.innerHTML = "Error occurred when trying to upload your file.<br \/>";
+         }
+         };
+     oOutput.innerHTML = "Sending file!";
+     console.log("Sending file!")
+     oReq.send(formData);
+}
+</script>
+</html>

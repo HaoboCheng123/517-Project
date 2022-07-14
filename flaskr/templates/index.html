@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Audiowide">
+<!--         <script type="text/javascript" {{ url_for('static', filename='app.js')}}></script>-->
+     <script type="text/javascript">
+<!--        text = {{ data | tojson }}-->
+
+     </script>
+
+    <style>
+        .info_row{
+            max-width:30px;
+            padding-left: 50px;
+            padding-right: 50px;
+            padding-top:10px;
+            color: white;
+        }
+        .info_text{
+            text-align:center
+            padding-left:10px;
+            padding-right:10px;
+        }
+        html, body{
+            height:100%;
+        }
+
+
+    </style>
+    <style>
+      * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Audiowide", sans-serif;
+    }
+
+    p {
+      margin-top: 0;
+      font-size: 20px;
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    h2 {
+      font-size: 42px;
+      margin-bottom: 15px;
+    }
+
+    button {
+      background: #e85757;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      display: block;
+      font-size: 18px;
+      font-weight: 700;
+      padding: 16px;
+      width: 120px;
+      color: #fff;
+    }
+
+    .card {
+      background: url({{ url_for('static', filename='riotlogo.jpg') }}) no-repeat;
+      background-size: cover;
+      box-shadow: 65px 65px 50px 0 #282830 inset, -65px -65px 50px 0 #282830 inset;
+      border-radius:20px;
+      max-width: 800px;
+      margin: auto;
+      height: 400px;
+      padding: 40px;
+      position: relative;
+      color: #fff;
+      transition: transform 0.1s ease;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    .card::before {
+      content: "";
+<!--      阴影-->
+<!--      background: rgba(0, 0, 0, 0.4); -->
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+    }
+
+    /* Slight parallax effect on hover */
+    .card:hover .content {
+      transform: translateZ(12px);
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      transition: transform 0.3s ease;
+    }
+
+    /* Demo only */
+    .container {
+      margin-top: 100px;
+    }
+
+    .photo-cred {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+    }
+
+    </style>
+</head>
+<body>
+<style>
+    .navigator-bar{
+        display: flex;
+        background-color: #5383E8;
+        padding-top:10px;
+        padding-bottom:10px;
+    }
+    .nav-a{
+        padding-left: 10px;
+        padding-right: 10px;
+        color:white;
+        text-decoration: none;
+    }
+    .main{
+        background-color: #282830;
+        padding-top:50px;
+        height:100%;
+    }
+    ::placeholder {
+        color: white;
+    }
+</style>
+</style>
+<div class = "navigator-bar">
+        <a class = "nav-a" href = "{{ url_for('home') }}">
+            Home
+        </a>
+        <a class = "nav-a" href = champion.html>
+            Champion
+        </a>
+        <a class = "nav-a" href = stats.html>
+            Stats
+        </a>
+        <a class = "nav-a" href = community.html>
+            Community
+        </a>
+        <a class = "nav-a" href = other.html>
+            Other
+        </a>
+        <a class = "nav-a" href = "{{ url_for('uploads') }}">
+                User Uploads
+        </a>
+        <a class = "nav-a" href= "{{ url_for('logout') }}">logout</a>
+    </div>
+<div class = "main">
+    {%if data == "DONOTDISPLAY" or data == "USERNOTEXIST"%}
+    <div style = "text-align:center">
+<!--        <img style = "padding:30px; border-radius: 50px; box-shadow: 25px 25px 50px 0 white inset, -25px -25px 50px 0 white inset;" src="{{url_for('static', filename='riotlogo.jpg')}}" align="middle" />-->
+        <div class="container">
+            <article class="card">
+                <div class="content">
+<!--                    <h2>The Best Beaches</h2>-->
+<!--                    <p>Check out these top 10 beaches this summer.</p>-->
+<!--                    <button type="button">Explore</button>-->
+                </div>
+            </article>
+        </div>
+        <h1 style = "color: white">Input the Summoner ID below</h1>
+        <form method="POST">
+        <div style = "">
+            <input style = "font-family:'Audiowide', sans-serif; width: 400px; height:45px; marign-left:20px; background-color:grey; padding:20px; border: none; box-shadow: 5px 5px 5px 0 #282830 inset, -5px -5px 5px 0 #282830 inset;" placeholder="Please input summoner ID..."  type="text" name="tag">
+            <input type="submit" value="GO!" style = "border: none; background:none; color: yellow; font-size:large;font-family:'Audiowide', sans-serif;">
+        </div>
+        </form>
+        {%if data == "USERNOTEXIST"%}
+            <br>
+            <p style = "color: red; font-size: medium">Summoner ID does not exist! Please re-enter the Summoner ID.</p>
+        {%endif%}
+    </div>
+    {%else%}
+    <h1 style = "color: purple; text-align:center">The latest game match for summoner {{ name }}</h1>
+    <div style = "display:flex; justify-content:center">
+        <div class = "info_row">
+            <span style = "color: red" class="info_text">Champion</span>
+        {%for i in range(0, 10)%}
+            <span class="info_text">{{ data[i]['champion Name'] }}</span>
+        {%endfor%}
+        </div>
+        <div class = "info_row">
+            <span style = "color: red" class="info_text">Kills</span>
+        {%for i in range(0, 10)%}
+            <span class="info_text">{{ data[i]['kills'] }}</span>
+        {%endfor%}
+        </div>
+        <div class = "info_row">
+            <span style = "color: red" class="info_text">Deaths</span>
+        {%for i in range(0, 10)%}
+            <span class="info_text">{{ data[i]['deaths'] }}</span>
+        {%endfor%}
+        </div>
+        <div class = "info_row">
+            <span style = "color: red" class="info_text">Assists</span>
+        {%for i in range(0, 10)%}
+            <span class="info_text">{{ data[i]['assists'] }}</span>
+        {%endfor%}
+        </div>
+        <div class = "info_row">
+            <span style = "color: red" class="info_text">TotalDamageDealt</span>
+        {%for i in range(0, 10)%}
+            <span class="info_text">{{ data[i]['DamageDealtToChamps'] }}</span>
+        {%endfor%}
+        </div>
+    </div>
+    {%endif%}
+</div>
+</body>
+    <script>
+        const card = document.querySelector(".card");
+        const motionMatchMedia = window.matchMedia("(prefers-reduced-motion)");
+        const THRESHOLD = 15;
+
+        /*
+         * Read the blog post here:
+         * https://letsbuildui.dev/articles/a-3d-hover-effect-using-css-transforms
+         */
+        function handleHover(e) {
+          const { clientX, clientY, currentTarget } = e;
+          const { clientWidth, clientHeight, offsetLeft, offsetTop } = currentTarget;
+
+          const horizontal = (clientX - offsetLeft) / clientWidth;
+          const vertical = (clientY - offsetTop) / clientHeight;
+          const rotateX = (THRESHOLD / 2 - horizontal * THRESHOLD).toFixed(2);
+          const rotateY = (vertical * THRESHOLD - THRESHOLD / 2).toFixed(2);
+
+          card.style.transform = `perspective(${clientWidth}px) rotateX(${rotateY}deg) rotateY(${rotateX}deg) scale3d(1, 1, 1)`;
+        }
+
+        function resetStyles(e) {
+          card.style.transform = `perspective(${e.currentTarget.clientWidth}px) rotateX(0deg) rotateY(0deg)`;
+        }
+
+        if (!motionMatchMedia.matches) {
+          card.addEventListener("mousemove", handleHover);
+          card.addEventListener("mouseleave", resetStyles);
+        }
+
+  </script>
+</html>
