@@ -12,41 +12,76 @@
 
     <style>
         .home_board {
-            font-family: 'Source Sans Pro';
-            font-size: 1.3em;
+            font-family: 'Oswald', sans-serif;
             position: absolute;
             z-index: 10;
-            width: 700px;
-            height: 160px;
-            background: #00bcd4;
+            width: 800px;
+            height: 190px;
             top: 40%;
-            left: 35%;
+            left: 29%;
+            text-align:center;
             margin: -110px 0 0 -100px;
-            padding: 20px;
             border-radius: 4px;
             box-sizing: border-box;
             z-index: 100;
+
+
+            transition: transform 0.1s ease;
+            background-size: cover;
+            box-shadow: 65px 65px 50px 0 #00000087 inset, -65px -65px 50px 0 #28283000 inset;
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+
+        .home_board::before {
+          content: "";
+    <!--      阴影-->
+    <!--      background: rgba(0, 0, 0, 0.4); -->
+          position: absolute;
+          height: 100%;
+          width: 100%;
+          left: 0;
+          right: 0;
+          top: 0;
+          bottom: 0;
+        }
+
+        .home_board:hover .content {
+            transform: translateZ(12px);
+        }
+
+        .content {
+          position: relative;
+          z-index: 1;
+          transition: transform 0.3s ease;
         }
 
         .enter_block {
-            font-family: 'Source Sans Pro';
-            font-size: 1.3em;
+            font-family: 'Oswald', sans-serif;
             position: absolute;
             z-index: 10;
-            width: 300px;
-            height: 80px;
-            background: #00bcd4;
-            top: 60%;
-            left: 60%;
+            width: 231px;
+            height: 55px;
+            padding-top:2px;
+            text-align:center;
+            top: 64%;
+            left: 55%;
             margin: -80px 0 0 -70px;
-            padding: 20px;
             border-radius: 4px;
-            box-sizing: border-box;
             z-index: 100;
+
+<!--            box-shadow: inset 0 0 0 0 #54b3d6;-->
+<!--            color: #54b3d6;-->
+<!--            transition: color .3s ease-in-out, box-shadow .3s ease-in-out;-->
         }
 
+<!--        .enter_block:hover {-->
+<!--            color: #fff;-->
+<!--            box-shadow: inset 200px 0 0 0 #54b3d6;;-->
+<!--        }-->
+
         h1{
-            font-size:xxx-large;
+            font-size:5em;
             color:white;
             font-family: 'Oswald', sans-serif;
         }
@@ -55,6 +90,33 @@
             color:white;
             font-family: 'Oswald', sans-serif;
         }
+
+        a {
+            font-size:xx-large;
+            color:white;
+            font-family: 'Oswald', sans-serif;
+            position: relative;
+        }
+
+        a::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 4px;
+            border-radius: 4px;
+            background-color: white;
+            bottom: 0;
+            left: 0;
+            transform-origin: right;
+            transform: scaleX(0);
+            transition: transform .3s ease-in-out;
+          }
+
+        a:hover::before {
+            transform-origin: left;
+            transform: scaleX(1);
+        }
+
 
     </style>
 </head>
@@ -67,12 +129,13 @@
 <!-- particles.js container -->
 <div id="particles-js">
     <div class = "home_board">
-        <h1>Linkedin Job Posting Network visualization - 517 Project</h1>
-
+        <div class = "content">
+            <h1>Linkedin Job Posting Network Visualization - 517 Project</h1>
+        </div>
     </div>
 
     <div class = "enter_block">
-        <h2 href = "{{ url_for('dashboard') }}">Enter Dashboard</h2>
+        <a href = "{{ url_for('dashboard') }}">Enter Dashboard</a>
     </div>
 
 
@@ -84,6 +147,35 @@
 
 <!-- stats.js -->
 <script src="/static/particlesjs/js/lib/stats.js"></script>
+
+
+<script>
+    const card = document.querySelector(".home_board");
+    const motionMatchMedia = window.matchMedia("(prefers-reduced-motion)");
+    const THRESHOLD = 15;
+
+    function handleHover(e) {
+      const { clientX, clientY, currentTarget } = e;
+      const { clientWidth, clientHeight, offsetLeft, offsetTop } = currentTarget;
+
+      const horizontal = (clientX - offsetLeft) / clientWidth;
+      const vertical = (clientY - offsetTop) / clientHeight;
+      const rotateX = (THRESHOLD / 2 - horizontal * THRESHOLD).toFixed(2);
+      const rotateY = (vertical * THRESHOLD - THRESHOLD / 2).toFixed(2);
+
+      card.style.transform = `perspective(${clientWidth}px) rotateX(${rotateY}deg) rotateY(${rotateX}deg) scale3d(1, 1, 1)`;
+    }
+
+    function resetStyles(e) {
+      card.style.transform = `perspective(${e.currentTarget.clientWidth}px) rotateX(0deg) rotateY(0deg)`;
+    }
+
+    if (!motionMatchMedia.matches) {
+      card.addEventListener("mousemove", handleHover);
+      card.addEventListener("mouseleave", resetStyles);
+    }
+
+</script>
 
 </body>
 
