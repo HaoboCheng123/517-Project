@@ -436,8 +436,16 @@
 			}
 
 			.service-section-header {
+			  max-height:500px;
 			  display: flex;
-			  align-items: center;
+			  justify-content: space-between;
+			}
+
+
+			.service-section-header#display_dataset {
+			  overflow: auto;
+			  max-height:500px;
+			  display: flex;
 			  justify-content: space-between;
 			}
 			.service-section-header > * + * {
@@ -851,7 +859,28 @@
 			li{
 				list-style: none
 			}
+
+			/* width */
+			::-webkit-scrollbar {
+			  width: 10px;
+			}
+
+			/* Track */
+			::-webkit-scrollbar-track {
+			  background: #f1f1f1;
+			}
+
+			/* Handle */
+			::-webkit-scrollbar-thumb {
+			  background: #888;
+			}
+
+			/* Handle on hover */
+			::-webkit-scrollbar-thumb:hover {
+			  background: #555;
+			}
  		</style>
+
 	</head>
 	<body>
 	<div class="app" id = "background">
@@ -945,7 +974,11 @@
 			</div>
 			<div class="app-body-main-content">
 				<section class="service-section">
-					<h2>Dataset</h2>
+					{% if analyze %}
+					<h2>Dataset (Top {{ analyze['observation_n'] }} observations) </h2>
+					{% else %}
+					<h2>Dataset (Top 50 observations) </h2>
+					{% endif %}
 					<div class="service-section-header" id = "display_dataset">
 						<div>
 							<p>Obs</p>
@@ -972,7 +1005,7 @@
 							{% endfor %}
 						</div>
 						<div>
-							<p>Urn</p>
+							<p>User ID</p>
 							{% for item in dataset %}
 							<li>
 								{{ item['memberUrn'] }}
@@ -991,11 +1024,20 @@
 				</section>
 
 				<section class="service-section" style = "display:none">
-					<h2>Analyzing</h2>
-					<div class="service-section-header">
+					{% if analyze %}
+					<h2 style = "margin-bottom:0">Result:</h2>
+					<div class="service-section-header" style = "display:block">
+						<h3 style = "color: #969593">Number of Members: {{ analyze['member_nums'] }}</h3>
+						<h3 style = "color: #969593; margin-left:0">Number of Companies: {{ analyze['company_nums'] }}</h3>
+					</div>
+					<br>
+					<hr style = "1px solid #969593">
+					<br>
+					<h2>Analyze</h2>
+					<form action="/Dashboard" method = "POST" class = "service-section-header">
 						<div class="search-field">
 							<i class="ph-magnifying-glass"></i>
-							<input type="text" placeholder="Top n observations">
+							<input type="text" name = "observation_n" placeholder="Top n observations, Input 1 <= n <= 30000">
 						</div>
 	<!--					<div class="dropdown-field">-->
 	<!--						<select>-->
@@ -1004,65 +1046,25 @@
 	<!--						</select>-->
 	<!--						<i class="ph-caret-down"></i>-->
 	<!--					</div>-->
-						<button class="flat-button">
-							Analyze
-						</button>
-					</div>
-					<div class="mobile-only">
-						<button class="flat-button">
-							Analyze
-						</button>
-					</div>
-	<!--				<div class="tiles">-->
-	<!--					<article class="tile">-->
-	<!--						<div class="tile-header">-->
-	<!--							<i class="ph-lightning-light"></i>-->
-	<!--							<h3>-->
-	<!--								<span>Electricity</span>-->
-	<!--								<span>UrkEnergo LTD.</span>-->
-	<!--							</h3>-->
-	<!--						</div>-->
-	<!--						<a href="#">-->
-	<!--							<span>Go to service</span>-->
-	<!--							<span class="icon-button">-->
-	<!--								<i class="ph-caret-right-bold"></i>-->
-	<!--							</span>-->
-	<!--						</a>-->
-	<!--					</article>-->
-	<!--					<article class="tile">-->
-	<!--						<div class="tile-header">-->
-	<!--							<i class="ph-fire-simple-light"></i>-->
-	<!--							<h3>-->
-	<!--								<span>Heating Gas</span>-->
-	<!--								<span>Gazprom UA</span>-->
-	<!--							</h3>-->
-	<!--						</div>-->
-	<!--						<a href="#">-->
-	<!--							<span>Go to service</span>-->
-	<!--							<span class="icon-button">-->
-	<!--								<i class="ph-caret-right-bold"></i>-->
-	<!--							</span>-->
-	<!--						</a>-->
-	<!--					</article>-->
-	<!--					<article class="tile">-->
-	<!--						<div class="tile-header">-->
-	<!--							<i class="ph-file-light"></i>-->
-	<!--							<h3>-->
-	<!--								<span>Tax online</span>-->
-	<!--								<span>Kharkov 62 str.</span>-->
-	<!--							</h3>-->
-	<!--						</div>-->
-	<!--						<a href="#">-->
-	<!--							<span>Go to service</span>-->
-	<!--							<span class="icon-button">-->
-	<!--								<i class="ph-caret-right-bold"></i>-->
-	<!--							</span>-->
-	<!--						</a>-->
-	<!--					</article>-->
-	<!--				</div>-->
-	<!--				<div class="service-section-footer">-->
-	<!--					<p>Services are paid according to the current state of the currency and tariff.</p>-->
-	<!--				</div>-->
+						<input type = "submit" value = "Analyze" class="flat-button">
+					</form>
+					{% else %}
+					<h2>Analyze</h2>
+					<form action="/Dashboard" method = "POST" class = "service-section-header">
+						<div class="search-field">
+							<i class="ph-magnifying-glass"></i>
+							<input type="text" name = "observation_n" placeholder="Top n observations, Input 1 <= n <= 30000">
+						</div>
+	<!--					<div class="dropdown-field">-->
+	<!--						<select>-->
+	<!--							<option>Home</option>-->
+	<!--							<option>Work</option>-->
+	<!--						</select>-->
+	<!--						<i class="ph-caret-down"></i>-->
+	<!--					</div>-->
+						<input type = "submit" value = "Analyze" class="flat-button">
+					</form>
+					{% endif %}
 				</section>
 
 				<section class="service-section" style = "display:none">
