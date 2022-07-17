@@ -245,7 +245,7 @@
 			  transform: translateX(4px);
 			  color: var(--c-text-primary);
 			}
-			@media (max-width: 1200px) {
+			@media only screen and (max-width: 1300px) {
 			  li{
 			  	font-size:small;
 			  }
@@ -946,8 +946,47 @@
 			<div class="app-body-main-content">
 				<section class="service-section">
 					<h2>Dataset</h2>
-					<div class="service-section-header">
-						<h1>Display dataset here</h1>
+					<div class="service-section-header" id = "display_dataset">
+						<div>
+							<p>Observation number</p>
+							{% for item in dataset %}
+							<li>
+								{{ item['members'] }}
+							</li>
+							{% endfor %}
+						</div>
+						<div>
+							<p>Company Name</p>
+							{% for item in dataset %}
+							<li>
+								{{ item['companyName'] }}
+							</li>
+							{% endfor %}
+						</div>
+						<div>
+							<p>Follower Count</p>
+							{% for item in dataset %}
+							<li>
+								{{ item['followersCount'] }}
+							</li>
+							{% endfor %}
+						</div>
+						<div>
+							<p>Member Urn</p>
+							{% for item in dataset %}
+							<li>
+								{{ item['memberUrn'] }}
+							</li>
+							{% endfor %}
+						</div>
+						<div>
+							<p>Gender</p>
+							{% for item in dataset %}
+							<li>
+								{{ item['genderEstimate'] }}
+							</li>
+							{% endfor %}
+						</div>
 					</div>
 				</section>
 
@@ -1240,7 +1279,8 @@
 			elements[0].style.opacity = opacity + 0.01;
 			setTimeout(fadeIn, 5);
 		})();
-	</script>
+
+		</script>
 
 	</body>
 </html>
