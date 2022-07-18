@@ -1,10 +1,10 @@
 import json
 from flask import Response
-from flask import Flask, render_template, redirect, url_for, request, jsonify
-from flask_cors import CORS
-from flask import flash
+from flask import Flask, render_template, request, jsonify
+import networkx as nx
 import os
 import pandas as pd
+from networkx.utils import groups
 
 app = Flask(__name__)
 
@@ -43,43 +43,33 @@ def dashboard():
         dataset_json = Linkedin_dataset.to_dict('records')
         members = []
         companies = []
+        relations = []
         for i in range(len(Linkedin_dataset)):
-            if dataset_json[i]['memberUrn'] not in members:
-                members.append(dataset_json[i]['memberUrn'])
-            if dataset_json[i]['companyName'] not in companies:
-                companies.append(dataset_json[i]['companyName'])
+            mem = dataset_json[i]['memberUrn']
+            com = dataset_json[i]['companyName']
+            relations.append((mem, com))
+            if mem not in members:
+                members.append(mem)
+            if com not in companies:
+                companies.append(com)
+
+        relations_edge = set(relations)
+        G = nx.Graph()
+
+        G.add_edges_from(relations_edge)
+
+        d = nx.json_graph.node_link_data(G)
+        graph_json = os.path.join(basedir, 'static/forcejs/force.json')
+        json.dump(d, open(graph_json, "w"))
 
         analyze = {
             "observation_n": form_data['observation_n'],
             "member_nums": len(members),
-            "company_nums": len(companies)
+            "company_nums": len(companies),
+            "edge_nums": len(relations_edge),
         }
         return render_template('dashboard.html', analyze=analyze, dataset=dataset_json)
     else:
         print(dataset_json_display)
         return render_template("dashboard.html", dataset=dataset_json_display)
 
-
-@app.route('/uploads')
-def uploads():
-    hists = os.listdir('static/uploads')
-    hists = [file for file in hists]
-    print(hists)
-    return render_template('uploads.html', hists=hists)
-
-
-@app.route('/', methods=['GET', 'POST'])
-def get_message():
-    # if request.method == "GET":
-    print("Got request in main function")
-    return render_template("index.html")
-
-
-@app.route('/upload_static_file', methods=['POST'])
-def upload_static_file():
-    print("Got request in static files")
-    print(request.files)
-    f = request.files['static_file']
-    f.save(os.path.join(app.root_path, 'static/uploads/' + f.filename))
-    resp = {"success": True, "response": "file saved!"}
-    return jsonify(resp), 200
