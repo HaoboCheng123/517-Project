@@ -10,6 +10,7 @@ app = Flask(__name__)
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 data_file_display = os.path.join(basedir, 'static/csv-files/MAT517_dataset2.csv')
+graph_json = os.path.join(basedir, 'static/forcejs/force.json')
 # data_file = os.path.join(basedir, 'static/csv-files/MAT517_dataset.csv')
 
 Linkedin_dataset_display = pd.read_csv(data_file_display)
@@ -17,6 +18,9 @@ Linkedin_dataset_display = pd.read_csv(data_file_display)
 
 dataset_json_display = Linkedin_dataset_display.to_dict('records')
 
+
+if os.path.exists(graph_json):
+    os.remove(graph_json)
 
 # dataset_json = Linkedin_dataset.to_dict('records')
 
@@ -58,8 +62,11 @@ def dashboard():
 
         G.add_edges_from(relations_edge)
 
+
         d = nx.json_graph.node_link_data(G)
-        graph_json = os.path.join(basedir, 'static/forcejs/force.json')
+
+
+
         json.dump(d, open(graph_json, "w"))
 
         analyze = {
@@ -70,6 +77,5 @@ def dashboard():
         }
         return render_template('dashboard.html', analyze=analyze, dataset=dataset_json)
     else:
-        print(dataset_json_display)
         return render_template("dashboard.html", dataset=dataset_json_display)
 

@@ -432,7 +432,12 @@
 			}
 
 			.service-section > h2 {
-			  font-size: 1.5rem;
+			  font-size: 1rem;
+			  margin-bottom: 1.25rem;
+			}
+
+			.service-section > h3 {
+			  font-size: small;
 			  margin-bottom: 1.25rem;
 			}
 
@@ -442,26 +447,6 @@
 			  justify-content: space-between;
 			}
 
-			@media (max-width: 1280px) {
-				  .service-section > h3 {
-				  font-size: small;
-				  margin-bottom: 0.5rem;
-				}
-
-				.service-section-header {
-				  font-size: medium;
-				  max-height:500px;
-				  display: flex;
-				  justify-content: space-between;
-				}
-
-				.service-section-header#display_dataset {
-				  overflow: auto;
-				  max-height:300px;
-				  display: flex;
-				  justify-content: space-between;
-				}
-			}
 
 			.service-section-header#display_dataset {
 			  overflow: auto;
@@ -470,7 +455,7 @@
 			  justify-content: space-between;
 			}
 			.service-section-header > * + * {
-			  margin-left: 1.25rem;
+			  margin-left: 1rem;
 			}
 			@media (max-width: 1000px) {
 			  .service-section-header {
@@ -1048,9 +1033,9 @@
 					{% if analyze %}
 					<h2 style = "margin-bottom:0">Result:</h2>
 					<div class="service-section-header" style = "display:block">
-						<h3 style = "color: #969593">Number of Members: {{ analyze['member_nums'] }}</h3>
-						<h3 style = "color: #969593; margin-left:0">Number of Companies: {{ analyze['company_nums'] }}</h3>
-						<h3 style = "color: #969593; margin-left:0">Number of edges: {{ analyze['edge_nums'] }}</h3>
+						<h3 style = "color: #969593; font-size: medium">Number of Members: {{ analyze['member_nums'] }}</h3>
+						<h3 style = "color: #969593; font-size: medium; margin-left:0">Number of Companies: {{ analyze['company_nums'] }}</h3>
+						<h3 style = "color: #969593; font-size: medium; margin-left:0">Number of edges: {{ analyze['edge_nums'] }}</h3>
 					</div>
 					<br>
 					<hr style = "1px solid #969593">
@@ -1092,7 +1077,8 @@
 				<section class="service-section" style = "display:none">
 					<h2>Generated Network</h2>
 					<div class="service-section-header">
-						<svg width="650" height="400"></svg>
+						<svg width="650" height="400">
+						</svg>
 					</div>
 				</section>
 
