@@ -18,10 +18,6 @@ Linkedin_dataset_display = pd.read_csv(data_file_display)
 
 dataset_json_display = Linkedin_dataset_display.to_dict('records')
 
-
-if os.path.exists(graph_json):
-    os.remove(graph_json)
-
 # dataset_json = Linkedin_dataset.to_dict('records')
 
 # members = []
@@ -77,5 +73,7 @@ def dashboard():
         }
         return render_template('dashboard.html', analyze=analyze, dataset=dataset_json)
     else:
+        if os.path.exists(graph_json):
+            os.remove(graph_json)
         return render_template("dashboard.html", dataset=dataset_json_display)
 
