@@ -33,7 +33,6 @@ dataset_json_display = Linkedin_dataset_display.to_dict('records')
 def home():
     return render_template("index.html")
 
-
 @app.route('/Dashboard', methods=['GET', 'POST'])
 def dashboard():
     if request.method == 'POST':
@@ -44,13 +43,17 @@ def dashboard():
         members = []
         companies = []
         relations = []
+        node_color = {}
+
         for i in range(len(Linkedin_dataset)):
-            mem = dataset_json[i]['memberUrn']
+            mem = dataset_json[i]['memberUrn'].split(':')[-1]
             com = dataset_json[i]['companyName']
             relations.append((mem, com))
             if mem not in members:
+                node_color[mem] = 1
                 members.append(mem)
             if com not in companies:
+                node_color[com] = 2
                 companies.append(com)
 
         relations_edge = set(relations)
@@ -58,10 +61,9 @@ def dashboard():
 
         G.add_edges_from(relations_edge)
 
+        nx.set_node_attributes(G, node_color, name="group")
 
         d = nx.json_graph.node_link_data(G)
-
-
 
         json.dump(d, open(graph_json, "w"))
 
@@ -76,4 +78,3 @@ def dashboard():
         if os.path.exists(graph_json):
             os.remove(graph_json)
         return render_template("dashboard.html", dataset=dataset_json_display)
-
