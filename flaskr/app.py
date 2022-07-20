@@ -44,15 +44,19 @@ def dashboard():
         companies = []
         relations = []
         node_color = {}
+        node_value = {}
 
         for i in range(len(Linkedin_dataset)):
             mem = dataset_json[i]['memberUrn'].split(':')[-1]
+            mem_follower = dataset_json[i]['followersCount']
             com = dataset_json[i]['companyName']
             relations.append((mem, com))
             if mem not in members:
+                node_value[mem] = mem_follower
                 node_color[mem] = 1
                 members.append(mem)
             if com not in companies:
+                node_value[com] = 0
                 node_color[com] = 2
                 companies.append(com)
 
@@ -61,7 +65,16 @@ def dashboard():
 
         G.add_edges_from(relations_edge)
 
+        for edges in G.edges():
+            node_value[edges[1]]+=node_value[edges[0]]
+
+        minVal = min(node_value.values())
+        maxVal = max(node_value.values())
+        for key in node_value.keys():
+            node_value[key] = (node_value[key]-minVal) / (maxVal - minVal)
+
         nx.set_node_attributes(G, node_color, name="group")
+        nx.set_node_attributes(G, node_value, name="value")
 
         d = nx.json_graph.node_link_data(G)
 

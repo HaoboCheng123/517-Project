@@ -2,13 +2,13 @@ var svg = d3.select("svg"),
     width = +svg.attr("width"),
     height = +svg.attr("height");
 
-var color = d3.scaleOrdinal(d3.schemeCategory20);
+var color = d3.scaleOrdinal(d3.schemeCategory10);
 
 var simulation = d3.forceSimulation()
 //    .force("link", d3.forceLink().id(function(d) { return d.id; }))
-    .force("charge", d3.forceManyBody().strength(-10))
-    .force("link", d3.forceLink().id(d => d.id).distance(20))
-    .force("center", d3.forceCenter(width / 2, height / 2));
+    .force("charge", d3.forceManyBody().strength(-5))
+    .force("link", d3.forceLink().id(d => d.id).distance(10))
+    .force("center", d3.forceCenter(width / 3, height / 3));
 
 d3.json("/static/forcejs/force.json", function(error, graph) {
   if (error) throw error;
@@ -26,7 +26,7 @@ d3.json("/static/forcejs/force.json", function(error, graph) {
     .enter().append("g")
 
   var circles = node.append("circle")
-    .attr("r", function(d) { return d.group*2; })
+    .attr("r", function(d) { return d.value * 5; })
     .attr("fill", function(d) { return color(d.group); });
 
   // Create a drag handler and append it to the node object instead
