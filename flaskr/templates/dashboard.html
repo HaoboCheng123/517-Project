@@ -952,14 +952,14 @@
 						<i class="ph-browsers"></i>
 						<span>Dashboard</span>
 					</a>
-					<a href="#">
-						<i class="ph-check-square"></i>
-						<span>Place Holder</span>
-					</a>
-					<a href="#">
-						<i class="ph-swap"></i>
-						<span>Place Holder</span>
-					</a>
+<!--					<a href="#">-->
+<!--						<i class="ph-check-square"></i>-->
+<!--						<span>Place Holder</span>-->
+<!--					</a>-->
+<!--					<a href="#">-->
+<!--						<i class="ph-swap"></i>-->
+<!--						<span>Place Holder</span>-->
+<!--					</a>-->
 	<!--				<a href="#">-->
 	<!--					<i class="ph-file-text"></i>-->
 	<!--					<span>Templates</span>-->
@@ -1049,13 +1049,14 @@
 							<i class="ph-magnifying-glass"></i>
 							<input type="text" name = "observation_n" placeholder="Top n observations, Input 1 <= n <= 30000">
 						</div>
-	<!--					<div class="dropdown-field">-->
-	<!--						<select>-->
-	<!--							<option>Home</option>-->
-	<!--							<option>Work</option>-->
-	<!--						</select>-->
-	<!--						<i class="ph-caret-down"></i>-->
-	<!--					</div>-->
+						<div class="dropdown-field">
+							<select name="centrality">
+								<option value = "Follower">Follower</option>
+								<option value = "Degree">Degree</option>
+								<option value = "Katz">Katz</option>
+							</select>
+							<i class="ph-caret-down"></i>
+						</div>
 						<input type = "submit" value = "Analyze" class="flat-button">
 					</form>
 					{% else %}
@@ -1065,13 +1066,14 @@
 							<i class="ph-magnifying-glass"></i>
 							<input type="text" name = "observation_n" placeholder="Top n observations, Input 1 <= n <= 30000">
 						</div>
-	<!--					<div class="dropdown-field">-->
-	<!--						<select>-->
-	<!--							<option>Home</option>-->
-	<!--							<option>Work</option>-->
-	<!--						</select>-->
-	<!--						<i class="ph-caret-down"></i>-->
-	<!--					</div>-->
+						<div class="dropdown-field">
+							<select name="centrality">
+								<option>Degree</option>
+								<option>Katz</option>
+								<option>Follower</option>
+							</select>
+							<i class="ph-caret-down"></i>
+						</div>
 						<input type = "submit" value = "Analyze" class="flat-button">
 					</form>
 					{% endif %}

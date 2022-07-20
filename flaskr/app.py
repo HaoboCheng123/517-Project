@@ -65,18 +65,25 @@ def dashboard():
 
         G.add_edges_from(relations_edge)
 
-        for edges in G.edges():
-            node_value[edges[1]]+=node_value[edges[0]]
-
-        minVal = min(node_value.values())
-        maxVal = max(node_value.values())
-        for key in node_value.keys():
-            node_value[key] = (node_value[key]-minVal) / (maxVal - minVal)
-
         nx.set_node_attributes(G, node_color, name="group")
-        nx.set_node_attributes(G, node_value, name="value")
 
-        d = nx.json_graph.node_link_data(G)
+        if form_data['centrality'] == "Follower":
+            for edges in G.edges():
+                node_value[edges[1]]+=node_value[edges[0]]
+
+            if node_value:
+                minVal = min(node_value.values())
+                maxVal = max(node_value.values())
+            for key in node_value.keys():
+                node_value[key] = (node_value[key]-minVal) / (maxVal - minVal)
+
+
+            nx.set_node_attributes(G, node_value, name="value")
+
+            d = nx.json_graph.node_link_data(G)
+        elif form_data['centrality'] == "Degree":
+            print(list(nx.degree(members)))
+
 
         json.dump(d, open(graph_json, "w"))
 
