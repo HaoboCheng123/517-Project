@@ -8,7 +8,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Audiowide">
 	<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300&family=Oswald&display=swap" rel="stylesheet">
-	<script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
+<!--	<script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>-->
     <link type="text/css" rel="stylesheet" href="/static/forcejs/force.css"/>
 	<title>Dashboard</title>
   	<style>
@@ -888,6 +888,30 @@
 			::-webkit-scrollbar-thumb:hover {
 			  background: #555;
 			}
+
+			#customers {
+			  font-family: Arial, Helvetica, sans-serif;
+			  border-collapse: collapse;
+			  width: 100%;
+			}
+
+			#customers td, #customers th {
+			  border-radius:5px;
+			  padding: 10px;
+			  margin-top:5px;
+			}
+
+			#customers tr:nth-child(even){background-color: #969593;}
+
+			#customers tr:hover {background-color: #ddd;}
+
+			#customers th {
+			  padding-top: 12px;
+			  padding-bottom: 12px;
+			  text-align: left;
+			  background-color: #0a66c2;
+			  color: white;
+			}
  		</style>
 
 	</head>
@@ -915,7 +939,7 @@
 						Analyze
 					</li>
 					<li data-rel = "3" style = "cursor:pointer">
-						Network
+						Result
 					</li>
 					<li data-rel = "4" style = "cursor:pointer">
 						Centrality Algorithm
@@ -1034,15 +1058,6 @@
 
 				<section class="service-section" style = "display:none">
 					{% if analyze %}
-					<h2 style = "margin-bottom:0">Result:</h2>
-					<div class="service-section-header" style = "display:block">
-						<h3 style = "color: #969593; font-size: medium">Number of Members: {{ analyze['member_nums'] }}</h3>
-						<h3 style = "color: #969593; font-size: medium; margin-left:0">Number of Companies: {{ analyze['company_nums'] }}</h3>
-						<h3 style = "color: #969593; font-size: medium; margin-left:0">Number of edges: {{ analyze['edge_nums'] }}</h3>
-					</div>
-					<br>
-					<hr style = "1px solid #969593">
-					<br>
 					<h2>Analyze</h2>
 					<form action="/Dashboard" method = "POST" class = "service-section-header">
 						<div class="search-field">
@@ -1051,14 +1066,36 @@
 						</div>
 						<div class="dropdown-field">
 							<select name="centrality">
-								<option value = "Follower">Follower</option>
-								<option value = "Degree">Degree</option>
-								<option value = "Katz">Katz</option>
+								<optgroup label="Undirected Graph">
+									<option value = "Follower">Follower</option>
+									<option value = "Degree">Degree</option>
+									<option value = "Eigen">Eigen</option>
+								</optgroup>
+								<optgroup label="Directed Graph">
+									<option value = "PageRank">PageRank</option>
+									<option value = "VoteRank">VoteRank</option>
+<!--									<option value = "Follower">Katz</option>-->
+								</optgroup>
 							</select>
+
 							<i class="ph-caret-down"></i>
 						</div>
 						<input type = "submit" value = "Analyze" class="flat-button">
 					</form>
+					<hr style = "1px solid #969593">
+					<h2 style = "margin-bottom:0">Result:</h2>
+					<div class="service-section-header" style = "display:block">
+						<h3 style = "color: #969593; font-size: medium">Number of Members: {{ analyze['member_nums'] }}</h3>
+						<h3 style = "color: #969593; font-size: medium; margin-left:0">Number of Companies: {{ analyze['company_nums'] }}</h3>
+						<h3 style = "color: #969593; font-size: medium; margin-left:0">Number of edges: {{ analyze['edge_nums'] }}</h3>
+						<h3 style = "color: #969593; font-size: medium; margin-left:0">Giant Component Size: {{ analyze['giant_component_size'] }}</h3>
+					</div>
+					<hr style = "1px solid #969593; margin-top:20px">
+					<h2 style = "margin-bottom:0">Giant Component:</h2>
+					<br>
+					<div style = "text-align: -webkit-center;">
+						<img src="/static/uploads/Giant_Component.png" style = "width:auto; height:500px">
+					</div>
 					{% else %}
 					<h2>Analyze</h2>
 					<form action="/Dashboard" method = "POST" class = "service-section-header">
@@ -1068,9 +1105,16 @@
 						</div>
 						<div class="dropdown-field">
 							<select name="centrality">
-								<option>Follower</option>
-								<option>Degree</option>
-								<option>Katz</option>
+								<optgroup label="Undirected Graph">
+									<option value = "Follower">Follower</option>
+									<option value = "Degree">Degree</option>
+									<option value = "Eigen">Eigen</option>
+								</optgroup>
+								<optgroup label="Directed Graph">
+									<option value = "PageRank">PageRank</option>
+									<option value = "VoteRank">VoteRank</option>
+<!--									<option value = "Follower">Katz</option>-->
+								</optgroup>
 							</select>
 							<i class="ph-caret-down"></i>
 						</div>
@@ -1080,10 +1124,27 @@
 				</section>
 
 				<section class="service-section" style = "display:none">
-					<h2>Generated Network</h2>
+<!--					<h2>Generated Network</h2>-->
+					<h2>Top 10 popular companies:</h2>
 					<div class="service-section-header" >
-						<svg width="800" height="500" id = "zoom">
-						</svg>
+						{% if top_companies %}
+						<table id="customers">
+							<tr>
+								<th>Ranking</th>
+								<th>Company</th>
+							</tr>
+							{% for i in range(1,11) %}
+							<tr>
+								{% if top_companies[i] %}
+									<td>Top #{{ i }}</td>
+									<td>{{ top_companies[i] }}</td>
+								{% endif %}
+							</tr>
+							{% endfor %}
+						</table>
+						{% endif %}
+<!--						<svg width="800" height="500" id = "zoom">-->
+<!--						</svg>-->
 					</div>
 				</section>
 
@@ -1184,8 +1245,7 @@
 					<div class="payments">
 						<div class="payment">
 							<div class="payment-details" style = "margin-left:0">
-								<h3>LinkedIn is an American business and employment-oriented online service that operates via websites and mobile apps. Launched on May 5, 2003, the platform is primarily used for professional networking and career development, and allows job seekers to post their CVs and employers to post jobs.
-									</h3>
+								<h3>The theme of our project is building a Network about LinkedIn Jobs Posting Dataset. First of all, Why we care this network? We do know the significance of employee networking. Based on our analysis of individual career paths datasets, focusing on their working companies, job titles, and member followers. We go as deep as we can to discover the social network connections between them. Eventually, We hope the analysis results will give some insights and suggestions to recent graduates, or people who are planning to change their job, helping them to get a better career development in the future.</h3>
 	<!--							<div>-->
 	<!--								<span></span>-->
 	<!--								<button class="icon-button">-->
@@ -1292,6 +1352,6 @@
 
 
 		</script>
-		<script type="text/javascript" src="/static/forcejs/force.js"></script>
+<!--		<script type="text/javascript" src="/static/forcejs/force.js"></script>-->
 	</body>
 </html>
