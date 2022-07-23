@@ -1,9 +1,12 @@
 import json
 from flask import Response
-from flask import Flask, render_template, request, jsonify
+
+from flask import Flask, render_template, request, jsonify, redirect, url_for
 import networkx as nx
 import os
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from networkx.utils import groups
 
@@ -30,6 +33,8 @@ dataset_json_display = Linkedin_dataset_display.to_dict('records')
 
 # return render_template("dashboard.html")
 
+# version = 0
+
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -54,11 +59,11 @@ def dashboard():
             relations.append((mem, com))
             if mem not in members:
                 node_value[mem] = mem_follower
-                node_color[mem] = 1
+                node_color[mem] = 'steelblue'
                 members.append(mem)
             if com not in companies:
                 node_value[com] = 0
-                node_color[com] = 2
+                node_color[com] = 'red'
                 companies.append(com)
 
         relations_edge = set(relations)
@@ -72,9 +77,11 @@ def dashboard():
 
             for edges in G.edges():
                 node_value[edges[1]] += node_value[edges[0]]
+
             if node_value:
                 minVal = min(node_value.values())
                 maxVal = max(node_value.values())
+
             for key in node_value.keys():
                 node_value[key] = (node_value[key]-minVal) / (maxVal - minVal)
 
@@ -122,23 +129,51 @@ def dashboard():
 
             # d = nx.json_graph.node_link_data(G)
 
-        elif form_data['centrality'] == "Eigen":
+        # elif form_data['centrality'] == "Eigen":
+        #     G = nx.Graph()
+        #
+        #     G.add_edges_from(relations_edge)
+        #
+        #     nx.set_node_attributes(G, node_color, name="group")
+        #
+        #     centrality = nx.eigenvector_centrality(G)
+        #     for v, c in centrality.items():
+        #         node_value[v] = c
+        #
+        #     # Data Normalization
+        #     # if node_value:
+        #     #     minVal = min(node_value.values())
+        #     #     maxVal = max(node_value.values())
+        #     # for key in node_value.keys():
+        #     #     node_value[key] = (node_value[key] - minVal) / (maxVal - minVal)
+        #
+        #     nx.set_node_attributes(G, node_value, name="value")
+
+        elif form_data['centrality'] == "Betweenness":
             G = nx.Graph()
 
             G.add_edges_from(relations_edge)
 
             nx.set_node_attributes(G, node_color, name="group")
 
-            centrality = nx.eigenvector_centrality(G)
+            centrality = nx.betweenness_centrality(G)
+
             for v, c in centrality.items():
                 node_value[v] = c
 
-            # Data Normalization
-            # if node_value:
-            #     minVal = min(node_value.values())
-            #     maxVal = max(node_value.values())
-            # for key in node_value.keys():
-            #     node_value[key] = (node_value[key] - minVal) / (maxVal - minVal)
+            nx.set_node_attributes(G, node_value, name="value")
+
+        elif form_data['centrality'] == "Closeness":
+            G = nx.Graph()
+
+            G.add_edges_from(relations_edge)
+
+            nx.set_node_attributes(G, node_color, name="group")
+
+            centrality = nx.closeness_centrality(G)
+
+            for v, c in centrality.items():
+                node_value[v] = c
 
             nx.set_node_attributes(G, node_value, name="value")
 
@@ -161,22 +196,24 @@ def dashboard():
             #     node_value[key] = (node_value[key] - minVal) / (maxVal - minVal)
 
             nx.set_node_attributes(G, node_value, name="value")
-        elif form_data['centrality'] == "VoteRank":
-            G = nx.DiGraph()
 
-            G.add_edges_from(relations_edge)
 
-            nx.set_node_attributes(G, node_color, name="group")
-
-            centrality = nx.voterank(G)
-
-            # if node_value:
-            #     minVal = min(node_value.values())
-            #     maxVal = max(node_value.values())
-            # for key in node_value.keys():
-            #     node_value[key] = (node_value[key] - minVal) / (maxVal - minVal)
-
-            nx.set_node_attributes(G, node_value, name="value")
+        # elif form_data['centrality'] == "VoteRank":
+        #     G = nx.DiGraph()
+        #
+        #     G.add_edges_from(relations_edge)
+        #
+        #     nx.set_node_attributes(G, node_color, name="group")
+        #
+        #     centrality = nx.voterank(G)
+        #
+        #     # if node_value:
+        #     #     minVal = min(node_value.values())
+        #     #     maxVal = max(node_value.values())
+        #     # for key in node_value.keys():
+        #     #     node_value[key] = (node_value[key] - minVal) / (maxVal - minVal)
+        #
+        #     nx.set_node_attributes(G, node_value, name="value")
 
             # d = nx.json_graph.node_link_data(G)
 
@@ -185,30 +222,64 @@ def dashboard():
         top_companies = {}
         rank_num = 1
 
-        if form_data['centrality'] != "VoteRank":
-            node_rank = dict(sorted(node_value.items(), key=lambda item: item[1], reverse=True))
+        node_rank = dict(sorted(node_value.items(), key=lambda item: item[1], reverse=True))
 
-            for node in node_rank.keys():
-                if node in companies and rank_num <= 10:
-                    top_companies[rank_num] = node
-                    rank_num += 1
-        else:
-            for node in centrality:
-                if rank_num <= 10:
-                    top_companies[rank_num] = node
-                    rank_num += 1
+        for node in node_rank.keys():
+            if node in companies and rank_num <= 10:
+                top_companies[rank_num] = node
+                rank_num += 1
 
+        # if form_data['centrality'] != "VoteRank":
+        #     node_rank = dict(sorted(node_value.items(), key=lambda item: item[1], reverse=True))
+        #
+        #     for node in node_rank.keys():
+        #         if node in companies and rank_num <= 10:
+        #             top_companies[rank_num] = node
+        #             rank_num += 1
+        # else:
+        #     for node in centrality:
+        #         if rank_num <= 10:
+        #             top_companies[rank_num] = node
+        #             rank_num += 1
+
+        # Data Normalization
+            if node_value:
+                minVal = min(node_value.values())
+                maxVal = max(node_value.values())
+            for key in node_value.keys():
+                node_value[key] = (node_value[key] - minVal) / (maxVal - minVal) * 200
 
         if nx.is_directed(G):
             giant_component = G.subgraph(max(nx.strongly_connected_components(G), key=len))
         else:
             giant_component = G.subgraph(max(nx.connected_components(G), key=len))
 
-        # nx.draw(giant_component,with_labels=True)
+        pos = nx.spring_layout(giant_component)
 
-        # save_dir = os.path.join(basedir, 'static/uploads/Giant_Component.png')
-        # plt.savefig(save_dir)
-        #
+        giant_component_node_color = []
+        giant_component_node_size = []
+        giant_component_label_size = []
+        for node in giant_component.nodes():
+            giant_component_node_color.append(node_color[node])
+            giant_component_node_size.append(node_value[node])
+            giant_component_label_size.append(node_value[node]/10)
+
+        if len(giant_component) <=50:
+            font_size = 9
+        elif len(giant_component)<=100:
+            font_size = 6
+        else:
+            font_size = 4
+
+        nx.draw_networkx_labels(giant_component, font_size=font_size, pos=pos)
+        nx.draw(giant_component, pos=pos, node_color=giant_component_node_color, node_size=giant_component_node_size)
+
+        save_dir = os.path.join(basedir, 'static/uploads/Giant_Component.png')
+        # save_dir = os.path.join(basedir, 'static/uploads/Giant_Component'+str(version)+'.png')
+        plt.savefig(save_dir)
+
+        plt.clf()
+
         # save_dir1 = os.path.join(basedir, 'static/uploads/Giant_Component1.png')
         # save_dir2 = os.path.join(basedir, 'static/uploads/Giant_Component2.png')
 
@@ -224,8 +295,8 @@ def dashboard():
         #     plt.savefig(save_dir1)
         #     img_file = 1
 
-
         analyze = {
+            "analyze_method": form_data['centrality'],
             "giant_component_size": len(giant_component.nodes()),
             "observation_n": form_data['observation_n'],
             "member_nums": len(members),
@@ -238,3 +309,16 @@ def dashboard():
         if os.path.exists(graph_json):
             os.remove(graph_json)
         return render_template("dashboard.html", dataset=dataset_json_display)
+
+@app.route("/delete", methods = ['POST', 'GET'])
+def delete():
+    save_dir = os.path.join(basedir, 'static/uploads/Giant_Component.png')
+    if os.path.exists(save_dir):
+        os.remove(save_dir)
+    return redirect(url_for(dashboard))
+
+
+if __name__ == '__main__':
+    # run() method of Flask class runs the application
+    # on the local development server.
+    app.run()

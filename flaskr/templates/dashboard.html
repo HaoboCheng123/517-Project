@@ -941,9 +941,9 @@
 					<li data-rel = "3" style = "cursor:pointer">
 						Result
 					</li>
-					<li data-rel = "4" style = "cursor:pointer">
-						Centrality Algorithm
-					</li>
+<!--					<li data-rel = "4" style = "cursor:pointer">-->
+<!--						Centrality Algorithm-->
+<!--					</li>-->
 				</nav>
 			</div>
 			<div class="app-header-actions">
@@ -1066,14 +1066,15 @@
 						</div>
 						<div class="dropdown-field">
 							<select name="centrality">
+								<option value="" disabled selected>Select a method:</option>
 								<optgroup label="Undirected Graph">
 									<option value = "Follower">Follower</option>
 									<option value = "Degree">Degree</option>
-									<option value = "Eigen">Eigen</option>
+									<option value = "Betweenness">Betweenness</option>
+									<option value = "Closeness">Closeness</option>
 								</optgroup>
 								<optgroup label="Directed Graph">
 									<option value = "PageRank">PageRank</option>
-									<option value = "VoteRank">VoteRank</option>
 <!--									<option value = "Follower">Katz</option>-->
 								</optgroup>
 							</select>
@@ -1083,7 +1084,7 @@
 						<input type = "submit" value = "Analyze" class="flat-button">
 					</form>
 					<hr style = "1px solid #969593">
-					<h2 style = "margin-bottom:0">Result:</h2>
+					<h2 style = "margin-bottom:0">Result: ({{ analyze['analyze_method'] }})</h2>
 					<div class="service-section-header" style = "display:block">
 						<h3 style = "color: #969593; font-size: medium">Number of Members: {{ analyze['member_nums'] }}</h3>
 						<h3 style = "color: #969593; font-size: medium; margin-left:0">Number of Companies: {{ analyze['company_nums'] }}</h3>
@@ -1096,6 +1097,10 @@
 					<div style = "text-align: -webkit-center;">
 						<img src="/static/uploads/Giant_Component.png" style = "width:auto; height:500px">
 					</div>
+
+					<form action="/delete" method = "POST" class = "service-section-header" style = "margin-top:20px">
+						<input type = "submit" value = "Reset Cache" class="flat-button">
+					</form>
 					{% else %}
 					<h2>Analyze</h2>
 					<form action="/Dashboard" method = "POST" class = "service-section-header">
@@ -1105,14 +1110,15 @@
 						</div>
 						<div class="dropdown-field">
 							<select name="centrality">
+								<option value="" disabled selected>Select a method</option>
 								<optgroup label="Undirected Graph">
 									<option value = "Follower">Follower</option>
 									<option value = "Degree">Degree</option>
-									<option value = "Eigen">Eigen</option>
+									<option value = "Betweenness">Betweenness</option>
+									<option value = "Closeness">Closeness</option>
 								</optgroup>
 								<optgroup label="Directed Graph">
 									<option value = "PageRank">PageRank</option>
-									<option value = "VoteRank">VoteRank</option>
 <!--									<option value = "Follower">Katz</option>-->
 								</optgroup>
 							</select>
@@ -1125,7 +1131,7 @@
 
 				<section class="service-section" style = "display:none">
 <!--					<h2>Generated Network</h2>-->
-					<h2>Top 10 popular companies:</h2>
+					<h2>Top 10 popular companies: ({{ analyze['analyze_method'] }})</h2>
 					<div class="service-section-header" >
 						{% if top_companies %}
 						<table id="customers">
@@ -1148,12 +1154,12 @@
 					</div>
 				</section>
 
-				<section class="service-section" style = "display:none">
-					<h2>Centrality Algorithm</h2>
-					<div class="service-section-header">
-						<h1>Different methods to calculate centrality</h1>
-					</div>
-				</section>
+<!--				<section class="service-section" style = "display:none">-->
+<!--					<h2>Centrality Algorithm</h2>-->
+<!--					<div class="service-section-header">-->
+<!--						<h1>Different methods to calculate centrality</h1>-->
+<!--					</div>-->
+<!--				</section>-->
 
 
 	<!--			<section class="transfer-section">-->
