@@ -1131,6 +1131,7 @@
 
 				<section class="service-section" style = "display:none">
 <!--					<h2>Generated Network</h2>-->
+					{% if analyze %}
 					<h2>Top 10 popular companies: ({{ analyze['analyze_method'] }})</h2>
 					<div class="service-section-header" >
 						{% if top_companies %}
@@ -1148,10 +1149,13 @@
 							</tr>
 							{% endfor %}
 						</table>
-						{% endif %}
 <!--						<svg width="800" height="500" id = "zoom">-->
 <!--						</svg>-->
+						{% endif %}
 					</div>
+					{% else %}
+					<h2>Please select the method in the previous section first.</h2>
+					{% endif %}
 				</section>
 
 <!--				<section class="service-section" style = "display:none">-->
