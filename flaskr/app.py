@@ -306,8 +306,6 @@ def dashboard():
 
         return render_template('dashboard.html', analyze=analyze, dataset=dataset_json, top_companies = top_companies)
     else:
-        if os.path.exists(graph_json):
-            os.remove(graph_json)
         return render_template("dashboard.html", dataset=dataset_json_display)
 
 @app.route("/delete", methods = ['POST', 'GET'])
