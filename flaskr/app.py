@@ -162,10 +162,10 @@ def dashboard():
         # average_path = nx.average_shortest_path_length(G)
 
         # Degree distribution
-        degrees = []
+        from collections import Counter
         degree_counter = [x[1] for x in list(G.degree(members+companies))]
-        # degree_distribution = list(degree_counter.values())
-        # print(degree_counter)
+        degree_distribution = Counter(degree_counter)
+        degree_distribution_sorted_keys = sorted(degree_distribution.keys())
 
         plt.hist(degree_counter, bins=(len(members) + len(companies)))
         plt.xlabel("Degree")
@@ -218,16 +218,16 @@ def dashboard():
             "edge_nums": len(relations_edge),
         }
 
-        return render_template('dashboard.html', analyze=analyze, dataset=dataset_json, top_companies = top_companies, analyze_status = "True")
+        return render_template('dashboard.html', analyze=analyze, dataset=dataset_json, top_companies = top_companies, analyze_status = "True", degree_distribution_sorted_keys = degree_distribution_sorted_keys, degree_distribution = degree_distribution)
     else:
         if os.path.exists(graph_json):
             os.remove(graph_json)
         return render_template("dashboard.html", dataset=dataset_json_display, analyze = "undefined", analyze_status = "False")
 
-# app.run(debug=True)
+app.run(debug=True)
 
 
-if __name__ == '__main__':
-    # run() method of Flask class runs the application
-    # on the local development server.
-    app.run()
+# if __name__ == '__main__':
+#     # run() method of Flask class runs the application
+#     # on the local development server.
+#     app.run()

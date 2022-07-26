@@ -1089,6 +1089,7 @@
 					<div class="service-section-header" style = "display:block">
 						<h3 style = "color: #969593; font-size: medium">Number of Members: {{ analyze['member_nums'] }}</h3>
 						<h3 style = "color: #969593; font-size: medium; margin-left:0">Number of Companies: {{ analyze['company_nums'] }}</h3>
+						<h3 style = "color: #969593; font-size: medium; margin-left:0">Number of Nodes: {{ analyze['member_nums'] + analyze['company_nums'] }}</h3>
 						<h3 style = "color: #969593; font-size: medium; margin-left:0">Number of edges: {{ analyze['edge_nums'] }}</h3>
 						<h3 style = "color: #969593; font-size: medium; margin-left:0">Average degree: {{ analyze['average_degree'] }}</h3>
 <!--						<h3 style = "color: #969593; font-size: medium; margin-left:0">Average Path: {{ analyze['average_path'] }}</h3>-->
@@ -1100,6 +1101,14 @@
 					<br>
 					<div style = "text-align: -webkit-center;">
 						<img src="/static/uploads/Degree_Distribution.png" style = "width:auto; height:500px">
+					</div>
+					<br>
+					<h3 style = "color: #969593; font-size: medium; margin-left:0">Degree Distribution:</h3>
+					<div style = "display: flex">
+						{% for dis in degree_distribution_sorted_keys %}
+						<h3 style = "color: #969593; font-size: medium; margin-right:10px">{{ dis
+						}}: {{ degree_distribution[dis] }}</h3>
+					{%endfor%}
 					</div>
 					<br>
 					<hr style = "1px solid #969593; margin-top:20px">
