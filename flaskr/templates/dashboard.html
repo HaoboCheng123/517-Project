@@ -1006,8 +1006,8 @@
 	<!--			</footer>-->
 			</div>
 			<div class="app-body-main-content">
-				<section class="service-section">
-					{% if analyze %}
+				<section class="service-section" id = "datasets">
+					{% if analyze_status == "True" %}
 					<h2>Dataset (Top {{ analyze['observation_n'] }} observations) </h2>
 					{% else %}
 					<h2>Dataset (Top 50 observations) </h2>
@@ -1057,12 +1057,12 @@
 				</section>
 
 				<section class="service-section" style = "display:none">
-					{% if analyze %}
+					{% if analyze_status == "True" %}
 					<h2>Analyze</h2>
 					<form action="/Dashboard" method = "POST" class = "service-section-header">
 						<div class="search-field">
-							<i class="ph-magnifying-glass"></i>
-							<input type="text" name = "observation_n" placeholder="Top n observations, Input 1 <= n <= 30000">
+							<input style = "font-size:small" type="text" name = "observation_n"
+								   placeholder="Top n observations, 1 <= n <= 30000">
 						</div>
 						<div class="dropdown-field">
 							<select name="centrality">
@@ -1081,32 +1081,47 @@
 
 							<i class="ph-caret-down"></i>
 						</div>
+
 						<input type = "submit" value = "Analyze" class="flat-button">
 					</form>
-					<hr style = "1px solid #969593">
+					<hr style = "1px solid #969593; margin-top:20px">
 					<h2 style = "margin-bottom:0">Result: ({{ analyze['analyze_method'] }})</h2>
 					<div class="service-section-header" style = "display:block">
 						<h3 style = "color: #969593; font-size: medium">Number of Members: {{ analyze['member_nums'] }}</h3>
 						<h3 style = "color: #969593; font-size: medium; margin-left:0">Number of Companies: {{ analyze['company_nums'] }}</h3>
 						<h3 style = "color: #969593; font-size: medium; margin-left:0">Number of edges: {{ analyze['edge_nums'] }}</h3>
+						<h3 style = "color: #969593; font-size: medium; margin-left:0">Average degree: {{ analyze['average_degree'] }}</h3>
+<!--						<h3 style = "color: #969593; font-size: medium; margin-left:0">Average Path: {{ analyze['average_path'] }}</h3>-->
+						<h3 style = "color: #969593; font-size: medium; margin-left:0">Clustering Coefficient: {{ analyze['clustering_coef'] }}</h3>
 						<h3 style = "color: #969593; font-size: medium; margin-left:0">Giant Component Size: {{ analyze['giant_component_size'] }}</h3>
 					</div>
 					<hr style = "1px solid #969593; margin-top:20px">
-					<h2 style = "margin-bottom:0">Giant Component:</h2>
+					<h2 style = "margin-bottom:0">Degree Distribution (Entire Network):</h2>
+					<br>
+					<div style = "text-align: -webkit-center;">
+						<img src="/static/uploads/Degree_Distribution.png" style = "width:auto; height:500px">
+					</div>
+					<br>
+					<hr style = "1px solid #969593; margin-top:20px">
+					<h2 style = "margin-bottom:0">Giant Component Graph:</h2>
 					<br>
 					<div style = "text-align: -webkit-center;">
 						<img src="/static/uploads/Giant_Component.png" style = "width:auto; height:500px">
 					</div>
+					<br>
+					<div style = "text-align:center; color: burlywood"><p>Please hit "ctrl + shift + r"
+						to refresh the graphs</p></div>
 
-					<form action="/delete" method = "POST" class = "service-section-header" style = "margin-top:20px">
-						<input type = "submit" value = "Reset Cache" class="flat-button">
-					</form>
+<!--					<form action="/delete" method = "POST" class = "service-section-header" style = "margin-top:20px">-->
+<!--						<p>Please refresh the page by hitting "ctrl + shift + r" to update the giant component graph</p>-->
+<!--						<input type = "submit" value = "Reset Cache" class="flat-button">-->
+<!--					</form>-->
 					{% else %}
 					<h2>Analyze</h2>
 					<form action="/Dashboard" method = "POST" class = "service-section-header">
 						<div class="search-field">
-							<i class="ph-magnifying-glass"></i>
-							<input type="text" name = "observation_n" placeholder="Top n observations, Input 1 <= n <= 30000">
+							<input style = "font-size:small" type="text" name = "observation_n"
+								   placeholder="Top n observations, Input 1 <= n <= 30000">
 						</div>
 						<div class="dropdown-field">
 							<select name="centrality">
@@ -1131,8 +1146,9 @@
 
 				<section class="service-section" style = "display:none">
 <!--					<h2>Generated Network</h2>-->
-					{% if analyze %}
-					<h2>Top 10 popular companies: ({{ analyze['analyze_method'] }})</h2>
+					{% if analyze_status == "True" %}
+					<h2>Top 10 popular companies: ({{ analyze['analyze_method'] }}, with n = {{
+						analyze['observation_n'] }})</h2>
 					<div class="service-section-header" >
 						{% if top_companies %}
 						<table id="customers">
@@ -1343,13 +1359,34 @@
 				$(this).addClass('active').siblings('li').removeClass('active');
 				var temp = $('section:nth-of-type('+$(this).data('rel')+')')
 				temp.siblings('section').fadeOut(300, 'linear');
-				temp.siblings('section').promise().done(function(){temp.fadeIn(300,'linear')});
-
-<!--				$('section:nth-of-type('+$(this).data('rel')+')').siblings('section').promise().done(function() {-->
-<!--					$('section:nth-of-type('+$(this).data('rel')+')').delay(600).fadeIn(500, 'linear');-->
-<!--				 });-->
+				temp.siblings('section').promise().done(function(){
+					temp.fadeIn(300,'linear')
+					var sideBar = document.getElementById('datasets');
+					const btnStyles = window.getComputedStyle(sideBar);
+					console.log(btnStyles.display)
+					if (btnStyles.display == "block"){
+						if ("{{ analyze_status }}" != "False"){
+							var analyze = JSON.parse('{{ analyze|tojson }}');
+							if (Number(analyze['observation_n']) > 50){
+								document.getElementsByClassName('app-body-sidebar')[0].style.display = "none"
+							}
+						}
+					}
+					else (document.getElementsByClassName('app-body-sidebar')[0].style.display = "block")
+				});
 			});
 		})(jQuery);
+
+		var sideBar = document.getElementById('datasets');
+		const btnStyles = window.getComputedStyle(sideBar);
+		if (btnStyles.display == "block"){
+			if ("{{ analyze_status }}" != "False"){
+				var analyze = JSON.parse('{{ analyze|tojson }}');
+				if (Number(analyze['observation_n']) > 50){
+					document.getElementsByClassName('app-body-sidebar')[0].style.display = "none"
+				}
+			}
+		}
 
 		var elements = document.getElementsByClassName('app');
 		elements[0].style.opacity = 0;

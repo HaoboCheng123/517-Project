@@ -8,6 +8,7 @@ import pandas as pd
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from collections import Counter
 from networkx.utils import groups
 
 app = Flask(__name__)
@@ -44,7 +45,10 @@ def dashboard():
     if request.method == 'POST':
         form_data = request.form
         data_file = os.path.join(basedir, 'static/csv-files/MAT517_dataset.csv')
-        Linkedin_dataset = pd.read_csv(data_file, nrows=int(form_data['observation_n']))
+        try:
+            Linkedin_dataset = pd.read_csv(data_file, nrows=int(form_data['observation_n']))
+        except:
+            return render_template("dashboard.html", dataset=dataset_json_display, analyze = "undefined", analyze_status = "False")
         dataset_json = Linkedin_dataset.to_dict('records')
         members = []
         companies = []
@@ -78,12 +82,12 @@ def dashboard():
             for edges in G.edges():
                 node_value[edges[1]] += node_value[edges[0]]
 
-            if node_value:
-                minVal = min(node_value.values())
-                maxVal = max(node_value.values())
-
-            for key in node_value.keys():
-                node_value[key] = (node_value[key]-minVal) / (maxVal - minVal)
+            # if node_value:
+            #     minVal = min(node_value.values())
+            #     maxVal = max(node_value.values())
+            #
+            # for key in node_value.keys():
+            #     node_value[key] = (node_value[key]-minVal) / (maxVal - minVal)
 
             nx.set_node_attributes(G, node_value, name="value")
 
@@ -249,6 +253,30 @@ def dashboard():
             for key in node_value.keys():
                 node_value[key] = (node_value[key] - minVal) / (maxVal - minVal) * 200
 
+        # Average Degree
+        average_degree = (sum(x[1] for x in list(G.degree(members))) + sum(x[1] for x in list(G.degree(companies)))) / (len(members) + len(companies))
+
+        #Clustering Coefficient
+        clustering_coef = average_degree / (len(members) + len(companies))
+
+        # # Average shortest path (Not feasible, since the graph is weakly connected)
+        # average_path = nx.average_shortest_path_length(G)
+
+        # Degree distribution
+        degrees = []
+        degree_counter = [x[1] for x in list(G.degree(members+companies))]
+        # degree_distribution = list(degree_counter.values())
+        print(degree_counter)
+
+        plt.hist(degree_counter, bins=(len(members) + len(companies)))
+        plt.xlabel("Degree")
+        plt.ylabel("Numbers of same degree")
+        save_dir = os.path.join(basedir, 'static/uploads/Degree_Distribution.png')
+        # save_dir = os.path.join(basedir, 'static/uploads/Giant_Component'+str(version)+'.png')
+        plt.savefig(save_dir)
+
+        plt.clf()
+
         if nx.is_directed(G):
             giant_component = G.subgraph(max(nx.strongly_connected_components(G), key=len))
         else:
@@ -296,6 +324,9 @@ def dashboard():
         #     img_file = 1
 
         analyze = {
+            # "average_path": average_path,
+            "clustering_coef": clustering_coef,
+            "average_degree": "{:.2f}".format(average_degree),
             "analyze_method": form_data['centrality'],
             "giant_component_size": len(giant_component.nodes()),
             "observation_n": form_data['observation_n'],
@@ -304,21 +335,23 @@ def dashboard():
             "edge_nums": len(relations_edge),
         }
 
-        return render_template('dashboard.html', analyze=analyze, dataset=dataset_json, top_companies = top_companies)
+        return render_template('dashboard.html', analyze=analyze, dataset=dataset_json, top_companies = top_companies, analyze_status = "True")
     else:
         if os.path.exists(graph_json):
             os.remove(graph_json)
-        return render_template("dashboard.html", dataset=dataset_json_display)
+        return render_template("dashboard.html", dataset=dataset_json_display, analyze = "undefined", analyze_status = "False")
 
-@app.route("/delete", methods = ['POST', 'GET'])
-def delete():
-    save_dir = os.path.join(basedir, 'static/uploads/Giant_Component.png')
-    if os.path.exists(save_dir):
-        os.remove(save_dir)
-    return redirect(url_for(dashboard))
+# @app.route("/delete", methods = ['POST', 'GET'])
+# def delete():
+#     save_dir = os.path.join(basedir, 'static/uploads/Giant_Component.png')
+#     if os.path.exists(save_dir):
+#         os.remove(save_dir)
+#     return redirect(url_for(dashboard))
+
+app.run(debug=True)
 
 
-if __name__ == '__main__':
-    # run() method of Flask class runs the application
-    # on the local development server.
-    app.run()
+# if __name__ == '__main__':
+#     # run() method of Flask class runs the application
+#     # on the local development server.
+#     app.run()
