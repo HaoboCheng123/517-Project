@@ -1,40 +1,20 @@
-import json
-from flask import Response
-
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request
 import networkx as nx
 import os
 import pandas as pd
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from collections import Counter
-from networkx.utils import groups
 
 app = Flask(__name__)
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 data_file_display = os.path.join(basedir, 'static/csv-files/MAT517_dataset2.csv')
 graph_json = os.path.join(basedir, 'static/forcejs/force.json')
-# data_file = os.path.join(basedir, 'static/csv-files/MAT517_dataset.csv')
 
 Linkedin_dataset_display = pd.read_csv(data_file_display)
-# Linkedin_dataset = pd.read_csv(data_file)
 
 dataset_json_display = Linkedin_dataset_display.to_dict('records')
-
-# dataset_json = Linkedin_dataset.to_dict('records')
-
-# members = []
-# for i in range(len(Linkedin_dataset)):
-#     if dataset_json[i]['memberUrn'] not in members:
-#         members.append(dataset_json[i]['memberUrn'])
-#
-# print(len(members))
-
-# return render_template("dashboard.html")
-
-# version = 0
 
 @app.route("/")
 def home():
@@ -82,26 +62,7 @@ def dashboard():
             for edges in G.edges():
                 node_value[edges[1]] += node_value[edges[0]]
 
-            # if node_value:
-            #     minVal = min(node_value.values())
-            #     maxVal = max(node_value.values())
-            #
-            # for key in node_value.keys():
-            #     node_value[key] = (node_value[key]-minVal) / (maxVal - minVal)
-
             nx.set_node_attributes(G, node_value, name="value")
-
-            # largest_cc = max(nx.connected_components(G), key=len)
-            #
-            # print(largest_cc)
-
-            # Convert network graph to json data
-            # d = nx.json_graph.node_link_data(G)
-
-            # for each in d['links']:
-            #     if each['source'] not in largest_cc and each['target'] not in largest_cc:
-            #         each.pop('source')
-            #         each.pop('target')
 
         elif form_data['centrality'] == "Degree":
             G = nx.Graph()
@@ -115,43 +76,7 @@ def dashboard():
             for v, c in centrality.items():
                 node_value[v] = c
 
-            # sorted(G.degree, key=lambda x: x[1], reverse=True)
-
-            # for each in G.degree(members):
-            #     node_value[each[0]] = each[1]
-            # for each in G.degree(companies):
-            #     node_value[each[0]] = each[1]
-
-            # Data Normalization
-            # if node_value:
-            #     minVal = min(node_value.values())
-            #     maxVal = max(node_value.values())
-            # for key in node_value.keys():
-            #     node_value[key] = (node_value[key] - minVal) / (maxVal - minVal)
-
             nx.set_node_attributes(G, node_value, name="value")
-
-            # d = nx.json_graph.node_link_data(G)
-
-        # elif form_data['centrality'] == "Eigen":
-        #     G = nx.Graph()
-        #
-        #     G.add_edges_from(relations_edge)
-        #
-        #     nx.set_node_attributes(G, node_color, name="group")
-        #
-        #     centrality = nx.eigenvector_centrality(G)
-        #     for v, c in centrality.items():
-        #         node_value[v] = c
-        #
-        #     # Data Normalization
-        #     # if node_value:
-        #     #     minVal = min(node_value.values())
-        #     #     maxVal = max(node_value.values())
-        #     # for key in node_value.keys():
-        #     #     node_value[key] = (node_value[key] - minVal) / (maxVal - minVal)
-        #
-        #     nx.set_node_attributes(G, node_value, name="value")
 
         elif form_data['centrality'] == "Betweenness":
             G = nx.Graph()
@@ -193,33 +118,7 @@ def dashboard():
             for v, c in centrality.items():
                 node_value[v] = c
 
-            # if node_value:
-            #     minVal = min(node_value.values())
-            #     maxVal = max(node_value.values())
-            # for key in node_value.keys():
-            #     node_value[key] = (node_value[key] - minVal) / (maxVal - minVal)
-
             nx.set_node_attributes(G, node_value, name="value")
-
-
-        # elif form_data['centrality'] == "VoteRank":
-        #     G = nx.DiGraph()
-        #
-        #     G.add_edges_from(relations_edge)
-        #
-        #     nx.set_node_attributes(G, node_color, name="group")
-        #
-        #     centrality = nx.voterank(G)
-        #
-        #     # if node_value:
-        #     #     minVal = min(node_value.values())
-        #     #     maxVal = max(node_value.values())
-        #     # for key in node_value.keys():
-        #     #     node_value[key] = (node_value[key] - minVal) / (maxVal - minVal)
-        #
-        #     nx.set_node_attributes(G, node_value, name="value")
-
-            # d = nx.json_graph.node_link_data(G)
 
         # If use d3 js, then need dump json data to a file
         # json.dump(d, open(graph_json, "w"))
@@ -266,13 +165,12 @@ def dashboard():
         degrees = []
         degree_counter = [x[1] for x in list(G.degree(members+companies))]
         # degree_distribution = list(degree_counter.values())
-        print(degree_counter)
+        # print(degree_counter)
 
         plt.hist(degree_counter, bins=(len(members) + len(companies)))
         plt.xlabel("Degree")
         plt.ylabel("Numbers of same degree")
         save_dir = os.path.join(basedir, 'static/uploads/Degree_Distribution.png')
-        # save_dir = os.path.join(basedir, 'static/uploads/Giant_Component'+str(version)+'.png')
         plt.savefig(save_dir)
 
         plt.clf()
@@ -308,21 +206,6 @@ def dashboard():
 
         plt.clf()
 
-        # save_dir1 = os.path.join(basedir, 'static/uploads/Giant_Component1.png')
-        # save_dir2 = os.path.join(basedir, 'static/uploads/Giant_Component2.png')
-
-        # if os.path.exists(save_dir1):
-        #     os.remove(save_dir1)
-        #     plt.savefig(save_dir2)
-        #     img_file = 2
-        # elif os.path.exists(save_dir2):
-        #     os.remove(save_dir2)
-        #     plt.savefig(save_dir1)
-        #     img_file = 1
-        # else:
-        #     plt.savefig(save_dir1)
-        #     img_file = 1
-
         analyze = {
             # "average_path": average_path,
             "clustering_coef": clustering_coef,
@@ -340,13 +223,6 @@ def dashboard():
         if os.path.exists(graph_json):
             os.remove(graph_json)
         return render_template("dashboard.html", dataset=dataset_json_display, analyze = "undefined", analyze_status = "False")
-
-# @app.route("/delete", methods = ['POST', 'GET'])
-# def delete():
-#     save_dir = os.path.join(basedir, 'static/uploads/Giant_Component.png')
-#     if os.path.exists(save_dir):
-#         os.remove(save_dir)
-#     return redirect(url_for(dashboard))
 
 # app.run(debug=True)
 
